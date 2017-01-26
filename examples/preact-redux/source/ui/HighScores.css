@@ -1,0 +1,30 @@
+.scores {
+
+  & .column {
+    float: left;
+    width: 200px;
+    margin-bottom: 20px;
+  }
+
+  & .column-item {
+    margin-bottom: 20px;
+    font-size: 20px;
+  }
+
+  & .numbers {
+    width: 60px;
+    margin-right: 30px;
+    text-align: right;
+  }
+
+  & .names {
+    text-align: left;
+  }
+
+  & button {
+    display: block;
+    clear: both;
+    margin: 0 auto;
+  }
+
+}
