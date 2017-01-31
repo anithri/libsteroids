@@ -5,7 +5,7 @@ Inspired by chriz001's [Reacteroids](https://github.com/chriz001/Reacteroids), L
 
 ## Examples
 
-All examples below use [Howler](https://github.com/goldfire/howler.js), [Pixi.js](https://github.com/pixijs/pixi.js) and [Three.js](https://github.com/mrdoob/three.js) and demonstrate four different ways to render game objects: SVG, 2D canvas (using Pixi.js) and 3D canvas (with either Pixi.js or Three.js).  Transpiling ES6+ is handled by [Babel](https://github.com/babel/babel), bundling is handled by [Webpack 2](https://github.com/webpack/webpack) and development server is made with [Koa 2](https://github.com/koajs/koa) and [Socket.io](https://github.com/socketio/socket.io) in each example.
+All examples below use [Howler](https://github.com/goldfire/howler.js), [Pixi.js](https://github.com/pixijs/pixi.js) and [Three.js](https://github.com/mrdoob/three.js) and demonstrate four different ways to render game objects: SVG, 2D canvas (using Pixi.js) and 3D canvas (with either Pixi.js or Three.js).  Transpiling ES6+ is handled by [Babel](https://github.com/babel/babel) and bundling is handled by [Webpack 2](https://github.com/webpack/webpack) in each example.
 
 ### React Redux
 
@@ -21,6 +21,8 @@ npm run serve
 open http://localhost:3000/
 
 ```
+
+Demo: https://movecodemove.github.io/libsteroids/react-redux/
 
 
 ### React MobX
@@ -38,6 +40,8 @@ open http://localhost:3000/
 
 ```
 
+Demo: https://movecodemove.github.io/libsteroids/react-mobx/
+
 
 ### Preact Redux
 
@@ -54,6 +58,8 @@ open http://localhost:3000/
 
 ```
 
+Demo: https://movecodemove.github.io/libsteroids/preact-redux/
+
 
 ### Inferno Redux
 
@@ -69,6 +75,8 @@ npm run serve
 open http://localhost:3000/
 
 ```
+
+Demo: https://movecodemove.github.io/libsteroids/inferno-redux/
 
 
 ## Credits

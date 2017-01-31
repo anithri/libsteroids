@@ -1,13 +1,3 @@
-import 'assets/beatTone1.wav'
-import 'assets/beatTone2.wav'
-import 'assets/explosionLarge.wav'
-import 'assets/explosionMedium.wav'
-import 'assets/explosionSmall.wav'
-import 'assets/saucerLarge.wav'
-import 'assets/saucerSmall.wav'
-import 'assets/shot.wav'
-import 'assets/spawn.wav'
-import 'assets/thrust.wav'
 import {inject, observer} from 'mobx-react'
 import {Howl} from 'howler'
 import * as EVENT from 'engine/Event'
@@ -15,16 +5,16 @@ import * as EVENT from 'engine/Event'
 const MAX_BEAT_DELAY = 1000
 const MIN_BEAT_DELAY = 300
 
-const beatTone1 = new Howl({src:['/beatTone1.wav'], preload:true})
-const beatTone2 = new Howl({src:['/beatTone2.wav'], preload:true})
-const explosionLarge = new Howl({src:['/explosionLarge.wav'], preload:true})
-const explosionMedium = new Howl({src:['/explosionMedium.wav'], preload:true})
-const explosionSmall = new Howl({src:['/explosionSmall.wav'], preload:true})
-const saucerLarge = new Howl({src:['/saucerLarge.wav'], loop:true, preload:true})
-const saucerSmall = new Howl({src:['/saucerSmall.wav'], loop:true, preload:true})
-const shot = new Howl({src:['/shot.wav'], preload:true})
-const spawn = new Howl({src:['/spawn.wav'], preload:true})
-const thrust = new Howl({src:['/thrust.wav'], autoplay: true, loop: true, preload:true, volume:0})
+const beatTone1 = new Howl({src:['./beatTone1.wav'], preload:true})
+const beatTone2 = new Howl({src:['./beatTone2.wav'], preload:true})
+const explosionLarge = new Howl({src:['./explosionLarge.wav'], preload:true})
+const explosionMedium = new Howl({src:['./explosionMedium.wav'], preload:true})
+const explosionSmall = new Howl({src:['./explosionSmall.wav'], preload:true})
+const saucerLarge = new Howl({src:['./saucerLarge.wav'], loop:true, preload:true})
+const saucerSmall = new Howl({src:['./saucerSmall.wav'], loop:true, preload:true})
+const shot = new Howl({src:['./shot.wav'], preload:true})
+const spawn = new Howl({src:['./spawn.wav'], preload:true})
+const thrust = new Howl({src:['./thrust.wav'], autoplay: true, loop: true, preload:true, volume:0})
 
 const playBeat = () =>
 {

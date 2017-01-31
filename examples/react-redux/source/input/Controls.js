@@ -1,4 +1,4 @@
-import {addKeyListener} from 'input/Keyboard'
+import {addKeyListener} from './Keyboard'
 
 const KEY = {
   UP: 38,

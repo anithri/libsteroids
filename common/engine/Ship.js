@@ -91,7 +91,7 @@ export default class Ship
     else
     {
       const {accelerating, hyperspace, shooting} = controls
-      const {rotation, velocity} = this
+      const {velocity} = this
 
       if (this.spawning)
       {

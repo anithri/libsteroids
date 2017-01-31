@@ -1,14 +1,11 @@
 import Inferno from 'inferno'
 import {Provider} from 'inferno-redux'
-import Infernoroids from 'ui/Infernoroids'
 import {store} from 'state/State'
+import Libsteroids from 'ui/Libsteroids'
 
 Inferno.render(
   <Provider {...{store}}>
-    <Infernoroids />
+    <Libsteroids />
   </Provider>,
   document.body.appendChild(document.createElement('div'))
 )
-
-if (DEVELOPMENT)
-  io('http://localhost:3000').on('webpack', () => location.reload())

@@ -1,5 +1,4 @@
-import 'assets/PressStart2P.woff2'
-import 'ui/Infernoroids.css'
+import 'ui/Libsteroids.css'
 import Inferno from 'inferno'
 import {connect} from 'inferno-redux'
 import {RENDERER, SCREEN} from 'state/Application'

@@ -1,15 +1,12 @@
 import React from 'react'
 import {render} from 'react-dom'
 import {Provider} from 'react-redux'
-import Reacteroids from 'ui/Reacteroids'
 import {store} from 'state/State'
+import Libsteroids from 'ui/Libsteroids'
 
 render(
   <Provider {...{store}}>
-    <Reacteroids />
+    <Libsteroids />
   </Provider>,
   document.body.appendChild(document.createElement('div'))
 )
-
-if (DEVELOPMENT)
-  io('http://localhost:3000').on('webpack', () => location.reload())

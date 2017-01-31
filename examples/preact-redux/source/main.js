@@ -1,17 +1,12 @@
 /* @jsx h */
 import {h, options, render} from 'preact'
 import {Provider} from 'preact-redux'
-import Preacteroids from 'ui/Preacteroids'
 import {store} from 'state/State'
-
-options.debounceRendering = requestAnimationFrame
+import Libsteroids from 'ui/Libsteroids'
 
 render(
   <Provider {...{store}}>
-    <Preacteroids />
+    <Libsteroids />
   </Provider>,
-  document.body
+  document.body.appendChild(document.createElement('div'))
 )
-
-if (DEVELOPMENT)
-  io('http://localhost:3000').on('webpack', () => location.reload())

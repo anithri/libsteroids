@@ -4,7 +4,7 @@ import Controls from 'input/Controls'
 import {addKeyListener} from 'input/Keyboard'
 import {reducer as applicationReducer, setHighScores, setRenderer, setUsername, showGame, showHighScores, RENDERER, SCREEN} from 'state/Application'
 import {reducer as gameReducer, setEvents, setLevel, setScore, setShipCount} from 'state/Game'
-import {reducer as stageReducer, setParticles, setPolygons} from 'state/Stage'
+import {reducer as stageReducer, resize, setParticles, setPolygons} from 'state/Stage'
 
 const KEY = {
   1: 49,

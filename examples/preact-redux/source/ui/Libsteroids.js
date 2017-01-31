@@ -1,6 +1,5 @@
 /* @jsx h */
-import 'assets/PressStart2P.woff2'
-import 'ui/Preacteroids.css'
+import 'ui/Libsteroids.css'
 import {h} from 'preact'
 import {connect} from 'preact-redux'
 import {RENDERER, SCREEN} from 'state/Application'

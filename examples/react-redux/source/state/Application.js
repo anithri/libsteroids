@@ -53,7 +53,12 @@ const setHighScores = highScores =>
   return {type: ACTION.SET_HIGH_SCORES, highScores}
 }
 
-const setRenderer = renderer => ({type: ACTION.SET_RENDERER, renderer})
+const setRenderer = renderer =>
+{
+  console.log(renderer)
+
+  return {type: ACTION.SET_RENDERER, renderer}
+}
 
 const setUsername = username => ({type: ACTION.SET_USERNAME, username})
 

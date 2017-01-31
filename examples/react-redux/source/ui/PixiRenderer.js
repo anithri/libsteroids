@@ -20,7 +20,7 @@ class PixiRenderer extends Component
 
   createRenderer = ({width, height, renderer}) =>
   {
-    const Renderer = renderer === RENDERER.CANVAS ? CanvasRenderer : WebGLRenderer
+    const Renderer = renderer === RENDERER.PIXI_CANVAS ? CanvasRenderer : WebGLRenderer
     let view
 
     if (this.renderer)

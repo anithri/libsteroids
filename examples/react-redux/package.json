@@ -1,19 +1,14 @@
 {
   "private": true,
-  "babel": {
-    "presets": [
-      ["env", {"targets": {"node": "current"}}],
-      "stage-2"
-    ],
-    "plugins": ["add-module-exports"]
-  },
   "scripts": {
-    "build": "node scripts build",
-    "serve": "node scripts serve"
+    "build": "cross-env NODE_ENV=production webpack",
+    "build-dev": "cross-env NODE_ENV=development webpack",
+    "serve": "cross-env NODE_ENV=development webpack-dev-server",
+    "serve-prod": "cross-env NODE_ENV=production webpack-dev-server"
   },
   "dependencies": {
     "howler": "^2.0.2",
-    "libsteroids-common": "^0.0.4",
+    "libsteroids-common": "^0.0.5",
     "pixi.js": "^4.3.4",
     "react": "^15.4.2",
     "react-dom": "^15.4.2",
@@ -22,29 +17,23 @@
     "three": "^0.84.0"
   },
   "devDependencies": {
+    "babel-core": "^6.22.1",
     "babel-loader": "^6.2.10",
-    "babel-plugin-add-module-exports": "^0.2.1",
-    "babel-preset-env": "^1.1.8",
+    "babel-preset-es2015": "^6.22.0",
     "babel-preset-react": "^6.22.0",
+    "babel-preset-react-hmre": "^1.1.1",
     "babel-preset-stage-2": "^6.22.0",
-    "babel-register": "^6.22.0",
-    "babili-webpack-plugin": "0.0.8",
-    "cli-color": "^1.1.0",
+    "copy-webpack-plugin": "^4.0.1",
+    "cross-env": "^3.1.4",
     "css-loader": "^0.26.1",
-    "extract-text-webpack-plugin": "^2.0.0-rc.0",
-    "file-loader": "^0.9.0",
-    "html-webpack-plugin": "^2.26.0",
-    "html-webpack-template": "^6.0.0",
-    "koa": "^2.0.0",
-    "koa-compress": "^2.0.0",
-    "koa-send": "^3.3.0",
-    "koa-socket": "^4.4.0",
-    "moment": "^2.17.1",
+    "file-loader": "^0.10.0",
     "postcss-cssnext": "^2.9.0",
     "postcss-loader": "^1.2.2",
-    "shelljs": "^0.7.6",
+    "rimraf": "^2.5.4",
     "stats.js": "^0.17.0",
-    "webpack": "^2.2.0",
+    "style-loader": "^0.13.1",
+    "webpack": "^2.2.1",
+    "webpack-dev-server": "^2.2.0",
     "worker-loader": "^0.7.1"
   }
 }
