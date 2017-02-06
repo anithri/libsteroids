@@ -1,0 +1,15 @@
+{
+  "name": "libsteroids-engine",
+  "version": "0.0.2",
+  "description": "Libsteroids game engine",
+  "keywords": ["libsteroids", "asteroids", "game", "javascript", "react", "redux", "mobx", "pixi", "three", "howler", "canvas"],
+  "homepage": "https://github.com/movecodemove/libsteroids",
+  "bugs": {
+    "url" : "https://github.com/movecodemove/libsteroids/issues",
+    "email" : "scott@movecodemove.com"
+  },
+  "author": "Scott Steven Rodriguez <scott@movecodemove.com> (http://movecodemove.com)",
+  "peerDependencies": {
+    "babel-core": "^6.22.1"
+  }
+}
