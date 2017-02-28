@@ -1,11 +1,20 @@
-export const RESIZE = 'RESIZE'
+export const Action = {
+  Resize: 'Resize',
+  SetParticles: 'SetParticles',
+  SetPolygons: 'SetPolygons'
+}
 
-export const SET_PARTICLES = 'SET_PARTICLES'
+export function resize()
+{
+  return {type: Action.Resize}
+}
 
-export const SET_POLYGONS = 'SET_POLYGONS'
+export function setParticles(particles)
+{
+  return {type: Action.SetParticles, particles}
+}
 
-export const resize = () => ({type: RESIZE})
-
-export const setParticles = particles => ({type: SET_PARTICLES, particles})
-
-export const setPolygons = polygons => ({type: SET_POLYGONS, polygons})
+export function setPolygons(polygons)
+{
+  return {type: Action.SetPolygons, polygons}
+}

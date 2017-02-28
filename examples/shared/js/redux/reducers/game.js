@@ -1,29 +1,24 @@
-import {SET_EVENTS, SET_LEVEL, SET_SCORE, SET_SHIP_COUNT} from 'state/actions/game'
+import {Action} from '../actions/game'
 
 const initialState = {
   events: [],
   level: 1,
-  score: 0,
-  shipCount: 0
+  score: 0
 }
 
-export default (state = initialState, action) =>
+export default function reducer(state = initialState, action)
 {
   switch (action.type)
   {
-    case SET_EVENTS:
+    case Action.SetEvents:
       return {...state, events: [...action.events]}
 
-    case SET_LEVEL:
+    case Action.SetLevel:
       return {...state, level: action.level}
 
-    case SET_SCORE:
+    case Action.SetScore:
       return {...state, score: action.score}
-
-    case SET_SHIP_COUNT:
-      return {...state, shipCount: action.shipCount}
-
-    default:
-      return state
   }
+
+  return state
 }

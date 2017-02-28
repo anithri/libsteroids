@@ -1,26 +1,28 @@
-import {RENDERER, SCREEN} from 'constants'
+export const Action = {
+  SetHighScores: 'SetHighScores',
+  SetRenderer: 'SetRenderer',
+  SetScreen: 'SetScreen',
+  SetUsername: 'SetUsername'
+}
 
-export const SET_HIGH_SCORES = 'SET_HIGH_SCORES'
-
-export const SET_RENDERER = 'SET_RENDERER'
-
-export const SET_SCREEN = 'SET_SCREEN'
-
-export const SET_USERNAME = 'SET_USERNAME'
-
-export const setHighScores = highScores =>
+export function setHighScores(highScores)
 {
   localStorage.setItem('highScores', JSON.stringify(highScores))
 
-  return {type: SET_HIGH_SCORES, highScores}
+  return {type: Action.SetHighScores, highScores}
 }
 
-export const setRenderer = renderer => ({type: SET_RENDERER, renderer})
+export function setRenderer(renderer)
+{
+  return {type: Action.SetRenderer, renderer}
+}
 
-export const setUsername = username => ({type: SET_USERNAME, username})
+export function setScreen(screen)
+{
+  return {type: Action.SetScreen, screen}
+}
 
-export const showGame = () => ({type: SET_SCREEN, screen: SCREEN.GAME})
-
-export const showHighScores = () => ({type: SET_SCREEN, screen: SCREEN.HIGH_SCORES})
-
-export const showMainMenu = () => ({type: SET_SCREEN, screen: SCREEN.MAIN_MENU})
+export function setUsername(username)
+{
+  return {type: Action.SetUsername, username}
+}

@@ -1,4 +1,4 @@
-import Event, {EXPLOSION_LARGE, SAUCER_LARGE_SPAWN, SAUCER_SMALL_SPAWN, SAUCER_REMOVED, SHOT} from './Event'
+import * as Event from './Event'
 import ExplosionParticle from './ExplosionParticle'
 import SaucerBullet from './SaucerBullet'
 import {randomNumberBetween, rotatePoint} from './Math'
@@ -74,10 +74,10 @@ export default class Saucer
           while (entities.size < EXPLOSION_PARTICLE_COUNT)
             entities.add(new ExplosionParticle(x, y, EXPLOSION_RADIUS))
 
-          entities.add(new Event(EXPLOSION_LARGE))
+          entities.add(Event.ExplosionLarge)
         }
 
-        entities.add(new Event(SAUCER_REMOVED))
+        entities.add(Event.SaucerRemoved)
       }
 
       else
@@ -101,7 +101,7 @@ export default class Saucer
 
           if (now > this._lastShotAt + SHOT_DELAY)
           {
-            entities.add(new Event(SHOT))
+            entities.add(Event.Shot)
             entities.add(new SaucerBullet(this, ship, stageWidth, stageHeight))
 
             this._lastShotAt = now
@@ -145,7 +145,7 @@ export default class Saucer
         _changeVelocityAt: Date.now() + randomNumberBetween(MINIMUM_VELOCITY_CHANGE_DURATION, MAXIMUM_VELOCITY_CHANGE_DURATION)
       })
 
-      entities.add(new Event(scale === 1 ? SAUCER_LARGE_SPAWN : SAUCER_SMALL_SPAWN))
+      entities.add(scale === 1 ? Event.SaucerLargeSpawn : Event.SaucerSmallSpawn)
     }
 
     return entities

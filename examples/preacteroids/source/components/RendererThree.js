@@ -10,13 +10,13 @@ const lineMaterial = new LineBasicMaterial({linewidth: 2})
 
 class Particle extends Component
 {
-  componentWillMount = () =>
+  componentWillMount()
   {
     this.mesh = particlePrototype.clone()
     this.props.scene.add(this.mesh)
   }
 
-  render = ({x, y, radius}) =>
+  render({x, y, radius})
   {
     const scale = radius / PARTICLE_PROTOTYPE_RADIUS
 
@@ -26,22 +26,25 @@ class Particle extends Component
     return null
   }
 
-  componentWillUnmount = () => this.props.scene.remove(this.mesh)
+  componentWillUnmount()
+  {
+    this.props.scene.remove(this.mesh)
+  }
 }
 
 class Polygon extends Component
 {
-  componentWillMount = () =>
+  componentWillMount()
   {
     const {scene, vertices} = this.props
-    const points = vertices.map(vertex => new Vector2(vertex.x, vertex.y)).concat(new Vector2(vertices[0].x, vertices[0].y))
+    const points = vertices.map(({x, y}) => new Vector2(x, y)).concat(new Vector2(vertices[0].x, vertices[0].y))
 
     this.line = new Line(new Path(points).createPointsGeometry(points.length), lineMaterial)
 
     scene.add(this.line)
   }
 
-  render = ({x, y, rotation}) =>
+  render({x, y, rotation})
   {
     this.line.position.set(x, y, 0)
     this.line.rotation.set(0, 0, rotation * Math.PI / 180)
@@ -49,12 +52,15 @@ class Polygon extends Component
     return null
   }
 
-  componentWillUnmount = () => this.props.scene.remove(this.line)
+  componentWillUnmount()
+  {
+    this.props.scene.remove(this.line)
+  }
 }
 
 class Renderer extends Component
 {
-  componentWillMount = () =>
+  componentWillMount()
   {
     const {width, height} = this.props
 
@@ -63,20 +69,32 @@ class Renderer extends Component
     this.renderer = new WebGLRenderer({antialias: true})
     this.renderer.setPixelRatio(window.devicePixelRatio)
     this.renderer.setSize(width, height)
-
-    document.body.insertBefore(this.renderer.domElement, document.body.lastChild)
   }
 
-  render = ({particles, polygons}) => (
-    <stage hidden>
-      {particles.length > 0 && <particles>{particles.map(({id, x, y, radius}) => <Particle {...{key:id, x, y, radius, scene: this.scene}} />)}</particles>}
-      {polygons.length > 0 && <polygons>{polygons.map(({id, x, y, rotation, vertices}) => <Polygon {...{key:id, x, y, rotation, vertices, scene: this.scene}} />)}</polygons>}
-    </stage>
-  )
+  render({particles, polygons})
+  {
+    return (
+      <renderer-three ref={wrapper => this.wrapper = wrapper}>
+        {particles.length > 0 && <particles>{particles.map(({id, x, y, radius}) => <Particle {...{key:id, x, y, radius, scene: this.scene}} />)}</particles>}
+        {polygons.length > 0 && <polygons>{polygons.map(({id, x, y, rotation, vertices}) => <Polygon {...{key:id, x, y, rotation, vertices, scene: this.scene}} />)}</polygons>}
+      </renderer-three>
+    )
+  }
 
-  componentDidUpdate = () => this.renderer.render(this.scene, this.camera)
+  componentDidMount()
+  {
+    this.wrapper.appendChild(this.renderer.domElement)
+  }
 
-  componentWillUnmount = () => document.body.removeChild(this.renderer.domElement)
+  componentDidUpdate()
+  {
+    this.renderer.render(this.scene, this.camera)
+  }
 }
 
-export default connect(({stage:{width, height, particles, polygons}}) => ({width, height, particles, polygons}))(Renderer)
+function mapStateToProps({stage:{width, height, particles, polygons}})
+{
+  return {width, height, particles, polygons}
+}
+
+export default connect(mapStateToProps)(Renderer)

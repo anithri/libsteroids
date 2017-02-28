@@ -1,48 +1,74 @@
 import 'css/HighScores.css'
-import Inferno from 'inferno'
 import Component from 'inferno-component'
 import {connect} from 'inferno-redux'
-import {bindActionCreators} from 'redux'
-import {showMainMenu} from 'state/actions/application'
+import {Screen} from 'constants'
+import {setScreen} from 'libsteroids-redux/actions'
 
 class HighScores extends Component
 {
-  render = ({highScores, showMainMenu}) =>
+  render({highScores, showMainMenu})
   {
     const numbers = []
     const names = []
     const scores = []
-    let number = 1
+    let number = 0
 
-    do numbers.push(number)
     while (number++ < 10)
-
-    highScores.forEach(item =>
     {
-      names.push(item.username)
-      scores.push(item.score)
+      numbers.push(`${number}.`)
+
+      if (number < 10)
+        numbers.push(<br />)
+    }
+
+    highScores.forEach((highScore, index) =>
+    {
+      names.push(highScore.username)
+
+      if (index < 9)
+        names.push(<br />)
+
+      scores.push(highScore.score)
+
+      if (index < 9)
+        scores.push(<br />)
     })
 
     return (
-      <div class="centered-overlay scores">
-        <div class="column numbers">
-          <h3>&nbsp;</h3>
-          {numbers.map(number => <div key={'number_' + number} class="column-item">{number}.</div>)}
-        </div>
-        <div class="column names">
-          <h3>NAME</h3>
-          {names.map((name, index) => <div key={'name_' + index} class="column-item">{name}</div>)}
-        </div>
-        <div class="column">
-          <h3>SCORE</h3>
-          {scores.map((score, index) => <div key={'score_' + index} class="column-item">{score}</div>)}
-        </div>
+      <high-scores class="centered">
+        <numbers>
+          <h2>&nbsp;</h2>
+          {numbers}
+        </numbers>
+        <names>
+          <h2>NAME</h2>
+          {names}
+        </names>
+        <scores>
+          <h2>SCORE</h2>
+          {scores}
+        </scores>
         <button ref={button => this.button = button} onClick={showMainMenu}>MAIN MENU</button>
-      </div>
+      </high-scores>
     )
   }
 
-  componentDidMount = () => this.button.focus()
+  componentDidMount()
+  {
+    this.button.focus()
+  }
 }
 
-export default connect(({application:{highScores}}) => ({highScores}), dispatch => bindActionCreators({showMainMenu}, dispatch))(HighScores)
+function mapStateToProps({application:{highScores}})
+{
+  return {highScores}
+}
+
+function mapDispatchToProps(dispatch)
+{
+  return {
+    showMainMenu: () => dispatch(setScreen(Screen.MainMenu))
+  }
+}
+
+export default connect(mapStateToProps, mapDispatchToProps)(HighScores)

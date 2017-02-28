@@ -1,0 +1,19 @@
+save-score {
+
+  & h2 {
+   margin: 20px;
+  }
+
+  & input {
+    display: block;
+    margin: 20px;
+    text-align: center;
+    text-transform: uppercase;
+    font-family: PressStart2P;
+    font-size: 28px;
+    color: white;
+    border: none;
+    background: transparent;
+  }
+
+}

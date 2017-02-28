@@ -1,108 +1,128 @@
 import MobX from 'mobx'
 import Stats from 'stats.js'
-import Controls from 'input/Controls'
-import {addKeyListener} from 'input/Keyboard'
-import {KEY, RENDERER, SCREEN} from 'constants'
-import Application from './stores/Application'
-import Game from './stores/Game'
-import Stage from './stores/Stage'
+import {GameControlKey, RendererSelectKey, Renderer, Screen} from 'constants'
+import {addKeyListener, removeKeyListener, keysDown} from 'input/keyboard'
+import {Event} from 'libsteroids-engine'
+import Application from 'state/stores/Application'
+import Controls from 'state/stores/Controls'
+import Game from 'state/stores/Game'
+import Stage from 'state/stores/Stage'
 
-MobX.useStrict(true)
+const EngineWorker = require('worker-loader?inline!libsteroids-examples-shared/js/EngineWorker.js')
 
-const EngineWorker = require('worker-loader?inline!shared/js/engine-worker.js')
+const GAME_OVER_PAUSE = 2000
 
-const startGame = () => engine.postMessage({action:'startGame'})
-
-const showHighScores = () => application.setScreen(SCREEN.HIGH_SCORES)
-
-const showMainMenu = () => application.setScreen(SCREEN.MAIN_MENU)
-
-const saveScore = username =>
+function startGame()
 {
-  let scores = application.highScores.concat()
+  Object.values(GameControlKey).forEach(keyCode => addKeyListener(keyCode, handleKeyEvent))
+  application.setScreen(Screen.Game)
+  engine.postMessage(JSON.stringify({action:'startGame'}))
+}
+
+function endGame()
+{
+  application.setScreen(Screen.GameOver)
+
+  Object.values(GameControlKey).forEach(keyCode => removeKeyListener(keyCode))
+
+  if (controls.accelerating)
+    controls.setAccelerating(false)
+
+  if (controls.rotatingLeft)
+    controls.setRotatingLeft(false)
+
+  if (controls.rotatingRight)
+    controls.setRotatingRight(false)
+
+  if (controls.shooting)
+    controls.setShooting(false)
+
+  setTimeout(() =>
+  {
+    const {score} = game
+    let {highScores} = application
+
+    if (score === 0
+    || (highScores.length === 10
+    && score < highScores[9].score))
+      return application.setScreen(Screen.HighScores)
+
+    application.setScreen(Screen.SaveScore)
+  },
+  GAME_OVER_PAUSE)
+}
+
+function saveScore(username)
+{
+  const {score} = game
+  let {highScores} = application
 
   username = username.toUpperCase()
 
-  scores.push({username, score:game.score})
-  scores.sort((a, b) => b.score - a.score)
+  highScores.push({username, score})
+  highScores.sort((a, b) => b.score - a.score)
 
-  if (scores.length > 10)
-    scores = scores.slice(0, 10)
+  if (highScores.length > 10)
+    highScores = highScores.slice(0, 10)
 
-  application.setHighScores(scores)
+  application.setHighScores(highScores)
   application.setUsername(username)
-
-  showHighScores()
+  application.setScreen(Screen.HighScores)
 }
 
-const requestEngineUpdate = () =>
+function requestEngineUpdate()
 {
   if (DEVELOPMENT)
     stats.begin()
 
-  const {accelerating, rotatingLeft, rotatingRight, shooting, hyperspace} = controls
-  const {width, height} = stage
-
-  engine.postMessage({action: 'update', controls: {accelerating, hyperspace, rotatingLeft, rotatingRight, shooting}, stageWidth: width, stageHeight: height})
+  engine.postMessage(JSON.stringify({action: 'update', controls, stageWidth: stage.width, stageHeight: stage.height}))
 }
 
-const handleEngineMessage = ({data}) =>
+function handleEngineMessage(message)
 {
-  const {screen} = application
-  const {events, level, score, shipCount} = game
+  const data = JSON.parse(message.data)
 
-  data.forEach((value, key) =>
+  Object.keys(data).forEach(key =>
   {
     switch (key)
     {
       case 'events':
-        game.setEvents(value)
+        game.setEvents(data.events)
         break
 
       case 'level':
-        if (level !== value)
-          game.setLevel(value)
+        game.setLevel(data.level)
         break
 
       case 'particles':
-        stage.setParticles(value)
+        stage.setParticles(data.particles)
         break
 
       case 'polygons':
-        stage.setPolygons(value)
+        stage.setPolygons(data.polygons)
         break
 
       case 'score':
-        if (score !== value)
-           game.setScore(value)
-        break
-
-      case 'shipCount':
-        if (shipCount !== value)
-           game.setShipCount(value)
+        game.setScore(data.score)
         break
     }
   })
 
-  if (!data.has('events')
-  && events.length > 0)
+  if (data.events
+  && data.events.includes(gameEndEventType))
+    endGame()
+
+  if (!data.events
+  && game.events.length > 0)
     game.setEvents([])
 
-  if (!data.has('particles')
+  if (!data.particles
   && stage.particles.length > 0)
     stage.setParticles([])
 
-  if (!data.has('polygons')
+  if (!data.polygons
   && stage.polygons.length > 0)
     stage.setPolygons([])
-
-  if (data.has('shipCount')
-  && application.screen !== SCREEN.GAME)
-    application.setScreen(SCREEN.GAME)
-
-  else if (!data.has('shipCount')
-  && application.screen === SCREEN.GAME)
-    game.setShipCount(0)
 
   if (DEVELOPMENT)
     stats.end()
@@ -110,21 +130,70 @@ const handleEngineMessage = ({data}) =>
   requestAnimationFrame(requestEngineUpdate)
 }
 
+function handleKeyEvent(keyCode, keyDown)
+{
+  if (Object.values(GameControlKey).includes(keyCode))
+  {
+    switch (keyCode)
+    {
+      case GameControlKey.ArrowUp:
+      case GameControlKey.w:
+        return controls.setAccelerating(keysDown.has(GameControlKey.ArrowUp) || keysDown.has(GameControlKey.w))
+
+      case GameControlKey.ArrowLeft:
+      case GameControlKey.a:
+        return controls.setRotatingLeft(keysDown.has(GameControlKey.ArrowLeft) || keysDown.has(GameControlKey.a))
+
+      case GameControlKey.ArrowRight:
+      case GameControlKey.d:
+        return controls.setRotatingRight(keysDown.has(GameControlKey.ArrowRight) || keysDown.has(GameControlKey.d))
+
+      case GameControlKey.Shift:
+        if (keyDown)
+        {
+          controls.setHyperspace(true)
+          controls.setHyperspace(false)
+        }
+        return
+
+      case GameControlKey.Space:
+        return controls.setShooting(keyDown)
+    }
+  }
+
+  else if (keyDown)
+    switch(keyCode)
+    {
+      case RendererSelectKey['1']:
+        return application.setRenderer(Renderer.SVG)
+
+      case RendererSelectKey['2']:
+        return application.setRenderer(Renderer.Canvas)
+
+      case RendererSelectKey['3']:
+        return application.setRenderer(Renderer.PixiCanvas)
+
+      case RendererSelectKey['4']:
+        return application.setRenderer(Renderer.PixiWebGL)
+
+      case RendererSelectKey['5']:
+        return application.setRenderer(Renderer.Three)
+    }
+}
+
+MobX.useStrict(true)
+
 const application = new Application()
 const controls = new Controls()
-const engine = new EngineWorker()
 const game = new Game()
 const stage = new Stage()
+const engine = new EngineWorker()
+const gameEndEventType = Event.GameEnd.type
 let stats
 
-addKeyListener(KEY['1'], pressed => pressed && application.setRenderer(RENDERER.SVG))
-addKeyListener(KEY['2'], pressed => pressed && application.setRenderer(RENDERER.CANVAS))
-addKeyListener(KEY['3'], pressed => pressed && application.setRenderer(RENDERER.PIXI_CANVAS))
-addKeyListener(KEY['4'], pressed => pressed && application.setRenderer(RENDERER.PIXI_WEBGL))
-addKeyListener(KEY['5'], pressed => pressed && application.setRenderer(RENDERER.THREE))
-window.addEventListener('resize', () => stage.resize())
-
+Object.values(RendererSelectKey).forEach(keyCode => addKeyListener(keyCode, handleKeyEvent))
 engine.onmessage = handleEngineMessage
+window.addEventListener('resize', () => stage.resize())
 
 if (DEVELOPMENT)
 {
@@ -135,4 +204,4 @@ if (DEVELOPMENT)
 
 requestEngineUpdate()
 
-export {application, game, stage, startGame, saveScore, showHighScores, showMainMenu}
+export {application, controls, game, stage, startGame, saveScore}

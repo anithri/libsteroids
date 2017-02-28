@@ -5,8 +5,9 @@ const CopyPlugin = require('copy-webpack-plugin')
 const {DefinePlugin, HotModuleReplacementPlugin, LoaderOptionsPlugin, NamedModulesPlugin, NoEmitOnErrorsPlugin, optimize} = webpack
 const {UglifyJsPlugin} = optimize
 const environment = process.env.NODE_ENV
-const sharedDirectory = path.resolve(__dirname, '..')
+const assetsDirectory = path.resolve(__dirname, '../../libsteroids-assets')
 const engineDirectory = path.resolve(__dirname, '../../libsteroids-engine')
+const sharedDirectory = path.resolve(__dirname, '..')
 const browsers = [
   'last 1 Chrome version',
   'last 1 Edge version',
@@ -26,35 +27,36 @@ const config = {
         test: /\.js$/,
         include: [engineDirectory, sharedDirectory],
         use: {
-          loader: 'babel-loader?cacheDirectory=true',
+          loader: 'babel-loader',
           query: {
+            cacheDirectory: true,
             presets: [
               ['es2015', {'modules': false}],
               'stage-2'
-            ],
+            ]
           }
         }
       }
     ]
   },
   output: {
-    filename: 'libsteroids.js'
+    filename: 'main.js'
   },
   plugins: [
     new CopyPlugin([
       {from: `${sharedDirectory}/html/index.html`},
-      {from: `${sharedDirectory}/icons/favicon.ico`},
-      {from: `${sharedDirectory}/fonts/PressStart2P.woff2`},
-      {from: `${sharedDirectory}/sounds/beatTone1.wav`},
-      {from: `${sharedDirectory}/sounds/beatTone2.wav`},
-      {from: `${sharedDirectory}/sounds/explosionLarge.wav`},
-      {from: `${sharedDirectory}/sounds/explosionMedium.wav`},
-      {from: `${sharedDirectory}/sounds/explosionSmall.wav`},
-      {from: `${sharedDirectory}/sounds/saucerLarge.wav`},
-      {from: `${sharedDirectory}/sounds/saucerSmall.wav`},
-      {from: `${sharedDirectory}/sounds/shot.wav`},
-      {from: `${sharedDirectory}/sounds/spawn.wav`},
-      {from: `${sharedDirectory}/sounds/thrust.wav`}
+      {from: `${assetsDirectory}/icon/favicon.ico`},
+      {from: `${assetsDirectory}/font/PressStart2P.woff2`},
+      {from: `${assetsDirectory}/sounds/beatTone1.wav`},
+      {from: `${assetsDirectory}/sounds/beatTone2.wav`},
+      {from: `${assetsDirectory}/sounds/explosionLarge.wav`},
+      {from: `${assetsDirectory}/sounds/explosionMedium.wav`},
+      {from: `${assetsDirectory}/sounds/explosionSmall.wav`},
+      {from: `${assetsDirectory}/sounds/saucerLarge.wav`},
+      {from: `${assetsDirectory}/sounds/saucerSmall.wav`},
+      {from: `${assetsDirectory}/sounds/shot.wav`},
+      {from: `${assetsDirectory}/sounds/spawn.wav`},
+      {from: `${assetsDirectory}/sounds/thrust.wav`}
     ]),
     new DefinePlugin({
       DEVELOPMENT: JSON.stringify(environment === 'development'),
@@ -69,13 +71,7 @@ const config = {
     new NoEmitOnErrorsPlugin()
   ],
   resolve: {
-    extensions: ['.js', '.css'],
-    alias: {
-      constants: `${sharedDirectory}/js/constants`,
-      css: `${sharedDirectory}/css`,
-      input: `${sharedDirectory}/js/input`,
-      shared: sharedDirectory
-    }
+    extensions: ['.js', '.css']
   },
   target: 'web'
 }
@@ -126,7 +122,7 @@ if (environment === 'production')
 
 else
 {
-  config.devtool = 'eval-cheap-module-source-map'
+  config.devtool = 'source-map'
 
   config.plugins.push(
     new	HotModuleReplacementPlugin(),

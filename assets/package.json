@@ -1,0 +1,13 @@
+{
+  "name": "libsteroids-assets",
+  "version": "0.0.4",
+  "description": "Libsteroids examples assets (favicon, font and sounds)",
+  "keywords": ["libsteroids", "asteroids", "game", "javascript", "typescript", "angular", "react", "inferno", "preact", "redux", "mobx", "ngrx", "rxjs", "pixi", "three", "howler", "svg", "canvas", "webgl"],
+  "homepage": "https://github.com/movecodemove/libsteroids",
+  "repository": "movecodemove/libsteroids",
+  "bugs": {
+    "url" : "https://github.com/movecodemove/libsteroids/issues",
+    "email" : "scott@movecodemove.com"
+  },
+  "author": "Scott Steven Rodriguez <scott@movecodemove.com> (http://movecodemove.com)"
+}

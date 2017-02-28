@@ -1,22 +1,34 @@
 import 'css/MainMenu.css'
-import Inferno from 'inferno'
 import Component from 'inferno-component'
 import {connect} from 'inferno-redux'
-import {bindActionCreators} from 'redux'
-import {startGame} from 'state'
-import {showHighScores} from 'state/actions/application'
+import {Screen} from 'constants'
+import {startGame} from 'libsteroids-redux'
+import {setScreen} from 'libsteroids-redux/actions'
 
 class MainMenu extends Component
 {
-  render = ({showHighScores}) => (
-    <div class="centered-overlay menu">
-      <h1>INFERNOROIDS</h1>
-      <button ref={startButton => this.startButton = startButton} onClick={startGame}>PLAY GAME</button>
-      <button onClick={showHighScores}>HIGH SCORES</button>
-    </div>
-  )
+  render({showHighScores})
+  {
+    return (
+      <main-menu class="centered">
+        <h1>INFERNOROIDS</h1>
+        <button ref={startButton => this.startButton = startButton} onClick={startGame}>PLAY GAME</button>
+        <button onClick={showHighScores}>HIGH SCORES</button>
+      </main-menu>
+    )
+  }
 
-  componentDidMount = () => this.startButton.focus()
+  componentDidMount()
+  {
+    this.startButton.focus()
+  }
 }
 
-export default connect(null, dispatch => bindActionCreators({showHighScores}, dispatch))(MainMenu)
+function mapDispatchToProps(dispatch)
+{
+  return {
+    showHighScores: () => dispatch(setScreen(Screen.HighScores))
+  }
+}
+
+export default connect(null, mapDispatchToProps)(MainMenu)

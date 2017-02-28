@@ -1,6 +1,6 @@
 import Asteroid, {SIZES as ASTEROID_SIZES} from './Asteroid'
 import CollisionTests from './CollisionTests'
-import Event, {GAME_START, GAME_END, NEW_LEVEL} from './Event'
+import * as Event from './Event'
 import ExplosionParticle from './ExplosionParticle'
 import Saucer from './Saucer'
 import SaucerBullet from './SaucerBullet'
@@ -9,20 +9,21 @@ import ShipBullet from './ShipBullet'
 import ThrustParticle from './ThrustParticle'
 import {randomNumberBetween, randomNumberBetweenExcluding} from './Math'
 
-const UPDATE_OPERATION = {
-  INITIALIZE: 'INITIALIZE',
-  UPDATE_ASTEROIDS: 'UPDATE_ASTEROIDS',
-  START_GAME: 'START_GAME',
-  UPDATE_GAME: 'UPDATE_GAME',
-  END_GAME: 'END_GAME'
-}
 const INTRO_ASTEROID_COUNT = 10
 const NEW_GAME_ASTEROID_COUNT = 3
 const NEW_ASTEROID_SHIP_OFFSET = 80
 const INITIAL_SHIPS_COUNT = 3
-const REMAINING_SHIPS_POSITION = {x:35, y:95}
+const REMAINING_SHIPS_POSITION = {x:30, y:95}
 const REMAINING_SHIP_SCALE = 0.75
 const REMAINING_SHIP_SPACING = 35
+
+const UpdateOperation = {
+  Initialize: 'Initialize',
+  UpdateAsteroids: 'UpdateAsteroids',
+  StartGame: 'StartGame',
+  UpdateGame: 'UpdateGame',
+  EndGame: 'EndGame'
+}
 
 export default class Engine
 {
@@ -42,25 +43,25 @@ export default class Engine
 
   thrustParticles = new Set()
 
-  nextUpdateOperation = UPDATE_OPERATION.INITIALIZE
+  nextUpdateOperation = UpdateOperation.Initialize
 
   update = data =>
   {
     switch (this.nextUpdateOperation)
     {
-      case UPDATE_OPERATION.INITIALIZE:
+      case UpdateOperation.Initialize:
         return this.initialize(data)
 
-      case UPDATE_OPERATION.UPDATE_ASTEROIDS:
+      case UpdateOperation.UpdateAsteroids:
         return this.updateAsteroids(data)
 
-      case UPDATE_OPERATION.START_GAME:
+      case UpdateOperation.StartGame:
         return this.startGame(data)
 
-      case UPDATE_OPERATION.UPDATE_GAME:
+      case UpdateOperation.UpdateGame:
         return this.updateGame(data)
 
-      case UPDATE_OPERATION.END_GAME:
+      case UpdateOperation.EndGame:
         return this.endGame(data)
     }
   }
@@ -79,7 +80,7 @@ export default class Engine
 
     entities.set('asteroids', this.asteroids)
 
-    this.nextUpdateOperation = UPDATE_OPERATION.UPDATE_ASTEROIDS
+    this.nextUpdateOperation = UpdateOperation.UpdateAsteroids
 
     return entities
   }
@@ -104,15 +105,15 @@ export default class Engine
     this.createNewLevelAsteroids(1, null, stageWidth, stageHeight)
     this.createRemainingShips()
     this.saucer.reset()
-    this.ship.spawn()
+    this.ship.spawn(stageWidth, stageHeight)
 
     entities.set('asteroids', this.asteroids)
-    entities.set('events', new Set([new Event(GAME_START)]))
+    entities.set('events', new Set([Event.GameStart]))
     entities.set('remainingShips', this.remainingShips)
     entities.set('score', this.score)
     entities.set('ship', this.ship)
 
-    this.nextUpdateOperation = UPDATE_OPERATION.UPDATE_GAME
+    this.nextUpdateOperation = UpdateOperation.UpdateGame
 
     return entities
   }
@@ -128,14 +129,6 @@ export default class Engine
 
     if (collisionTests.points)
       this.score += collisionTests.points
-
-    if (ship.destroyed)
-    {
-      remainingShips.delete([...remainingShips].pop())
-
-      if (remainingShips.size > 0)
-        ship.spawn()
-    }
 
     asteroids.forEach(asteroid =>
     {
@@ -163,6 +156,14 @@ export default class Engine
         saucerBullets.delete(saucerBullet)
     })
 
+    if (ship.destroyed)
+    {
+      remainingShips.delete([...remainingShips].pop())
+
+      if (remainingShips.size > 0)
+        ship.spawn(stageWidth, stageHeight)
+    }
+
     ship.update(controls, stageWidth, stageHeight).forEach(entity => entitiesAdded.add(entity))
 
     shipBullets.forEach(shipBullet =>
@@ -186,7 +187,7 @@ export default class Engine
       if (entity instanceof Asteroid)
         asteroids.add(entity)
 
-      else if (entity instanceof Event)
+      else if (entity instanceof Event.Class)
         events.add(entity)
 
       else if (entity instanceof ExplosionParticle)
@@ -210,7 +211,7 @@ export default class Engine
 
         this.createNewLevelAsteroids(this.level, ship, stageWidth, stageHeight)
 
-        events.add(new Event(NEW_LEVEL))
+        events.add(Event.NewLevel)
       }
 
       entities.set('remainingShips', remainingShips)
@@ -232,7 +233,7 @@ export default class Engine
     }
 
     else
-      this.nextUpdateOperation = UPDATE_OPERATION.END_GAME
+      this.nextUpdateOperation = UpdateOperation.EndGame
 
     if (asteroids.size > 0)
       entities.set('asteroids', asteroids)
@@ -253,7 +254,6 @@ export default class Engine
   {
     const {asteroids, explosionParticles, remainingShips, saucer, saucerBullets, shipBullets, thrustParticles} = this
     const entities = new Map()
-    const events = new Set()
 
     asteroids.forEach(asteroid => asteroid.update(stageWidth, stageHeight))
     explosionParticles.clear()
@@ -264,14 +264,14 @@ export default class Engine
     thrustParticles.clear()
 
     entities.set('asteroids', asteroids)
-    entities.set('events', new Set([new Event(GAME_END)]))
+    entities.set('events', new Set([Event.GameEnd]))
 
-    this.nextUpdateOperation = UPDATE_OPERATION.UPDATE_ASTEROIDS
+    this.nextUpdateOperation = UpdateOperation.UpdateAsteroids
 
     return entities
   }
 
-  requestGameStart = () => this.nextUpdateOperation = UPDATE_OPERATION.START_GAME
+  requestGameStart = () => this.nextUpdateOperation = UpdateOperation.StartGame
 
   createNewLevelAsteroids = (level, ship, stageWidth, stageHeight) =>
   {

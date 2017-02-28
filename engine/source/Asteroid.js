@@ -1,4 +1,4 @@
-import Event, {EXPLOSION_LARGE, EXPLOSION_MEDIUM, EXPLOSION_SMALL} from './Event'
+import * as Event from './Event'
 import ExplosionParticle from './ExplosionParticle'
 import {randomNumberBetween, rotatePoint} from './Math'
 
@@ -73,13 +73,13 @@ export default class Asteroid
         entities.add(new ExplosionParticle(x, y, radius))
 
       if (sizeIndex === 0)
-        entities.add(new Event(EXPLOSION_LARGE))
+        entities.add(Event.ExplosionLarge)
 
       else if ([1, 2].includes(sizeIndex))
-        entities.add(new Event(EXPLOSION_MEDIUM))
+        entities.add(Event.ExplosionMedium)
 
       else
-        entities.add(new Event(EXPLOSION_SMALL))
+        entities.add(Event.ExplosionSmall)
 
       if (sizeIndex < 3)
       {

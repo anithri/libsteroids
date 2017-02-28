@@ -1,0 +1,20 @@
+{
+  "compilerOptions": {
+    "baseUrl": "./source",
+    "emitDecoratorMetadata": true,
+    "experimentalDecorators": true,
+    "module": "ES6",
+    "moduleResolution": "node",
+    "target": "ES5",
+    "typeRoots": [
+      "./node_modules/@types"
+    ]
+  },
+  "angularCompilerOptions": {
+    "skipMetadataEmit": true
+  },
+  "awesomeTypescriptLoaderOptions": {
+    "useBabel": true,
+    "useCache": true
+  }
+}

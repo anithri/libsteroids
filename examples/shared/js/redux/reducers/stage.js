@@ -1,4 +1,4 @@
-import {RESIZE, SET_PARTICLES, SET_POLYGONS} from 'state/actions/stage'
+import {Action} from '../actions/stage'
 
 const initialState = {
   width: window.innerWidth,
@@ -7,20 +7,19 @@ const initialState = {
   polygons: []
 }
 
-export default (state = initialState, action) =>
+export default function reducer(state = initialState, action)
 {
   switch (action.type)
   {
-    case RESIZE:
+    case Action.Resize:
       return {...state, width: window.innerWidth, height: window.innerHeight}
 
-    case SET_PARTICLES:
+    case Action.SetParticles:
       return {...state, particles: [...action.particles]}
 
-    case SET_POLYGONS:
+    case Action.SetPolygons:
       return {...state, polygons: [...action.polygons]}
-
-    default:
-      return state
   }
+
+  return state
 }

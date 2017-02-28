@@ -1,33 +1,35 @@
-export const GAME_START = 'GAME_START'
-
-export const GAME_END = 'GAME_END'
-
-export const NEW_LEVEL = 'NEW_LEVEL'
-
-export const SHIP_SPAWN = 'SHIP_SPAWN'
-
-export const SHIP_THRUST_START = 'SHIP_THRUST_START'
-
-export const SHIP_THRUST_STOP = 'SHIP_THRUST_STOP'
-
-export const SAUCER_LARGE_SPAWN = 'SAUCER_LARGE_SPAWN'
-
-export const SAUCER_SMALL_SPAWN = 'SAUCER_SMALL_SPAWN'
-
-export const SAUCER_REMOVED = 'SAUCER_REMOVED'
-
-export const SHOT = 'SHOT'
-
-export const EXPLOSION_LARGE = 'EXPLOSION_LARGE'
-
-export const EXPLOSION_MEDIUM = 'EXPLOSION_MEDIUM'
-
-export const EXPLOSION_SMALL = 'EXPLOSION_SMALL'
-
-export default class Event
+class Event
 {
   constructor(type)
   {
     this.type = type
   }
 }
+
+export const GameStart = new Event('GameStart')
+
+export const ShipSpawn = new Event('ShipSpawn')
+
+export const ShipThrustStart = new Event('ShipThrustStart')
+
+export const ShipThrustStop = new Event('ShipThrustStop')
+
+export const SaucerLargeSpawn = new Event('SaucerLargeSpawn')
+
+export const SaucerSmallSpawn = new Event('SaucerSmallSpawn')
+
+export const SaucerRemoved = new Event('SaucerRemoved')
+
+export const Shot = new Event('Shot')
+
+export const ExplosionLarge = new Event('ExplosionLarge')
+
+export const ExplosionMedium = new Event('ExplosionMedium')
+
+export const ExplosionSmall = new Event('ExplosionSmall')
+
+export const NewLevel = new Event('NewLevel')
+
+export const GameEnd = new Event('GameEnd')
+
+export {Event as Class}

@@ -1,20 +1,59 @@
-import Stats from 'stats.js'
 import {combineReducers, createStore} from 'redux'
-import Controls from 'input/Controls'
-import {addKeyListener} from 'input/Keyboard'
-import {KEY, RENDERER, SCREEN} from 'constants'
-import {setHighScores, setRenderer, setUsername, showGame, showHighScores, showMainMenu} from 'state/actions/application'
-import {setEvents, setLevel, setScore, setShipCount} from 'state/actions/game'
-import {resize, setParticles, setPolygons} from 'state/actions/stage'
-import application from 'state/reducers/application'
-import game from 'state/reducers/game'
-import stage from 'state/reducers/stage'
+import Stats from 'stats.js'
+import {Event} from 'libsteroids-engine'
+import {GameControlKey, RendererSelectKey, Renderer, Screen} from '../constants'
+import {addKeyListener, removeKeyListener, keysDown} from '../input/keyboard'
+import {resize, setAccelerating, setEvents, setHighScores, setHyperspace, setLevel, setParticles, setRenderer, setPolygons, setRotatingLeft, setRotatingRight, setScore, setScreen, setShooting, setUsername} from './actions'
+import combinedReducer from './reducers'
 
-const EngineWorker = require('worker-loader?inline!shared/js/engine-worker.js')
+const EngineWorker = require('worker-loader?inline!../EngineWorker.js')
 
-const startGame = () => engine.postMessage({action:'startGame'})
+const GAME_OVER_PAUSE = 2000
 
-const saveScore = username =>
+function startGame()
+{
+  Object.values(GameControlKey).forEach(keyCode => addKeyListener(keyCode, handleKeyEvent))
+  store.dispatch(setScreen(Screen.Game))
+  engine.postMessage(JSON.stringify({action:'startGame'}))
+}
+
+function endGame()
+{
+  const {controls} = store.getState()
+
+  store.dispatch(setScreen(Screen.GameOver))
+
+  Object.values(GameControlKey).forEach(keyCode => removeKeyListener(keyCode))
+
+  if (controls.accelerating)
+    store.dispatch(setAccelerating(false))
+
+  if (controls.rotatingLeft)
+    store.dispatch(setRotatingLeft(false))
+
+  if (controls.rotatingRight)
+    store.dispatch(setRotatingRight(false))
+
+  if (controls.shooting)
+    store.dispatch(setShooting(false))
+
+  setTimeout(() =>
+  {
+    const {application, game} = store.getState()
+    const {score} = game
+    let {highScores} = application
+
+    if (score === 0
+    || (highScores.length === 10
+    && score < highScores[9].score))
+      return store.dispatch(setScreen(Screen.HighScores))
+
+    store.dispatch(setScreen(Screen.SaveScore))
+  },
+  GAME_OVER_PAUSE)
+}
+
+function saveScore(username)
 {
   const {application, game} = store.getState()
   const {score} = game
@@ -30,78 +69,67 @@ const saveScore = username =>
 
   store.dispatch(setHighScores(highScores))
   store.dispatch(setUsername(username))
-  store.dispatch(showHighScores())
+  store.dispatch(setScreen(Screen.HighScores))
 }
 
-const requestEngineUpdate = () =>
+function requestEngineUpdate()
 {
   if (DEVELOPMENT)
     stats.begin()
 
-  const {accelerating, rotatingLeft, rotatingRight, shooting, hyperspace} = controls
-  const {width, height} = store.getState().stage
+  const {controls, stage} = store.getState()
 
-  engine.postMessage({action: 'update', controls: {accelerating, hyperspace, rotatingLeft, rotatingRight, shooting}, stageWidth: width, stageHeight: height})
+  engine.postMessage(JSON.stringify({action: 'update', controls, stageWidth: stage.width, stageHeight: stage.height}))
 }
 
-const handleEngineMessage = ({data}) =>
+function handleEngineMessage(message)
 {
   const {application, game, stage} = store.getState()
   const {screen} = application
-  const {events, level, score, shipCount} = game
+  const {events, level, score} = game
+  const data = JSON.parse(message.data)
 
-  data.forEach((value, key) =>
+  Object.keys(data).forEach(key =>
   {
     switch (key)
     {
       case 'events':
-        store.dispatch(setEvents(value))
+        store.dispatch(setEvents(data.events))
         break
 
       case 'level':
-        if (level !== value)
-          store.dispatch(setLevel(value))
+        store.dispatch(setLevel(data.level))
         break
 
       case 'particles':
-        store.dispatch(setParticles(value))
+        store.dispatch(setParticles(data.particles))
         break
 
       case 'polygons':
-        store.dispatch(setPolygons(value))
+        store.dispatch(setPolygons(data.polygons))
         break
 
       case 'score':
-        if (score !== value)
-          store.dispatch(setScore(value))
-        break
-
-      case 'shipCount':
-        if (shipCount !== value)
-          store.dispatch(setShipCount(value))
+        store.dispatch(setScore(data.score))
         break
     }
   })
 
-  if (!data.has('events')
+  if (data.events
+  && data.events.includes(gameEndEventType))
+    endGame()
+
+  if (!data.events
   && events.length > 0)
     store.dispatch(setEvents([]))
 
-  if (!data.has('particles')
+  if (!data.particles
   && stage.particles.length > 0)
     store.dispatch(setParticles([]))
 
-  if (!data.has('polygons')
+  if (!data.polygons
   && stage.polygons.length > 0)
     store.dispatch(setPolygons([]))
-
-  if (data.has('shipCount')
-  && application.screen !== SCREEN.GAME)
-    store.dispatch(showGame())
-
-  else if (!data.has('shipCount')
-  && application.screen === SCREEN.GAME)
-    store.dispatch(setShipCount(0))
 
   if (DEVELOPMENT)
     stats.end()
@@ -109,18 +137,64 @@ const handleEngineMessage = ({data}) =>
   requestAnimationFrame(requestEngineUpdate)
 }
 
-const controls = new Controls()
+function handleKeyEvent(keyCode, keyDown)
+{
+  if (Object.values(GameControlKey).includes(keyCode))
+  {
+    switch (keyCode)
+    {
+      case GameControlKey.ArrowUp:
+      case GameControlKey.w:
+        return store.dispatch(setAccelerating(keysDown.has(GameControlKey.ArrowUp) || keysDown.has(GameControlKey.w)))
+
+      case GameControlKey.ArrowLeft:
+      case GameControlKey.a:
+        return store.dispatch(setRotatingLeft(keysDown.has(GameControlKey.ArrowLeft) || keysDown.has(GameControlKey.a)))
+
+      case GameControlKey.ArrowRight:
+      case GameControlKey.d:
+        return store.dispatch(setRotatingRight(keysDown.has(GameControlKey.ArrowRight) || keysDown.has(GameControlKey.d)))
+
+      case GameControlKey.Shift:
+        if (keyDown)
+        {
+          store.dispatch(setHyperspace(true))
+          store.dispatch(setHyperspace(false))
+        }
+        return
+
+      case GameControlKey.Space:
+        return store.dispatch(setShooting(keyDown))
+    }
+  }
+
+  else if (keyDown)
+    switch(keyCode)
+    {
+      case RendererSelectKey['1']:
+        return store.dispatch(setRenderer(Renderer.SVG))
+
+      case RendererSelectKey['2']:
+        return store.dispatch(setRenderer(Renderer.Canvas))
+
+      case RendererSelectKey['3']:
+        return store.dispatch(setRenderer(Renderer.PixiCanvas))
+
+      case RendererSelectKey['4']:
+        return store.dispatch(setRenderer(Renderer.PixiWebGL))
+
+      case RendererSelectKey['5']:
+        return store.dispatch(setRenderer(Renderer.Three))
+    }
+}
+
 const engine = new EngineWorker()
-const store = createStore(combineReducers({application, game, stage}))
+const gameEndEventType = Event.GameEnd.type
+const store = createStore(combinedReducer)
 let stats
 
+Object.values(RendererSelectKey).forEach(keyCode => addKeyListener(keyCode, handleKeyEvent))
 engine.onmessage = handleEngineMessage
-
-addKeyListener(KEY['1'], pressed => pressed && store.dispatch(setRenderer(RENDERER.SVG)))
-addKeyListener(KEY['2'], pressed => pressed && store.dispatch(setRenderer(RENDERER.CANVAS)))
-addKeyListener(KEY['3'], pressed => pressed && store.dispatch(setRenderer(RENDERER.PIXI_CANVAS)))
-addKeyListener(KEY['4'], pressed => pressed && store.dispatch(setRenderer(RENDERER.PIXI_WEBGL)))
-addKeyListener(KEY['5'], pressed => pressed && store.dispatch(setRenderer(RENDERER.THREE)))
 window.addEventListener('resize', () => store.dispatch(resize()))
 
 if (DEVELOPMENT)

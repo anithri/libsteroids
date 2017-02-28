@@ -1,4 +1,4 @@
-import Event, {EXPLOSION_LARGE, SHIP_SPAWN, SHIP_THRUST_START, SHIP_THRUST_STOP, SHOT} from './Event'
+import * as Event from './Event'
 import ExplosionParticle from './ExplosionParticle'
 import ShipBullet from './ShipBullet'
 import ThrustParticle from './ThrustParticle'
@@ -47,9 +47,26 @@ export default class Ship
     return this._hitArea
   }
 
-  _spawn = false
+  spawn = (stageWidth, stageHeight) =>
+  {
+    const now = Date.now()
 
-  spawn = () => this._spawn = true
+    Object.assign(this, {
+      x: stageWidth / 2,
+      y: stageHeight / 2,
+      rotation: 180,
+      velocity: {x:0, y:0},
+      accelerating: false,
+      spawning: true,
+      visible: true,
+      destroyed: false,
+      _hitArea: null,
+      _lastShotAt: 0,
+      _spawnedAt: now,
+      _spawnBlinkToggleAt: now,
+      _spawnEventAdded: false
+    })
+  }
 
   update = (controls, stageWidth, stageHeight) =>
   {
@@ -57,35 +74,12 @@ export default class Ship
     const now = Date.now()
     let {x, y, rotation} = this
 
-    if (this._spawn)
-    {
-      Object.assign(this, {
-        x: stageWidth / 2,
-        y: stageHeight / 2,
-        rotation: 180,
-        velocity: {x:0, y:0},
-        accelerating: false,
-        spawning: true,
-        visible: true,
-        destroyed: false,
-        _spawn: false,
-        _hitArea: null,
-        _spawnedAt: now,
-        _spawnBlinkToggleAt: now,
-        _lastShotAt: 0
-      })
-
-      entities.add(new Event(SHIP_SPAWN))
-    }
-
-    else if (this.destroyed)
+    if (this.destroyed)
     {
       while (entities.size < EXPLOSION_PARTICLE_COUNT)
         entities.add(new ExplosionParticle(x, y, EXPLOSION_RADIUS))
 
-      entities.add(new Event(EXPLOSION_LARGE))
-
-      this._spawn = true
+      entities.add(Event.ExplosionLarge)
     }
 
     else
@@ -95,6 +89,13 @@ export default class Ship
 
       if (this.spawning)
       {
+        if (!this._spawnEventAdded)
+        {
+          entities.add(Event.ShipSpawn)
+
+          this._spawnEventAdded = true
+        }
+
         if (now > this._spawnedAt + SPAWN_DURATION)
         {
           this.spawning = false
@@ -134,7 +135,7 @@ export default class Ship
         if (accelerating)
         {
           if (!this.accelerating)
-            entities.add(new Event(SHIP_THRUST_START))
+            entities.add(Event.ShipThrustStart)
 
           if (this.spawning)
           {
@@ -147,7 +148,7 @@ export default class Ship
         }
 
         else if (this.accelerating)
-          entities.add(new Event(SHIP_THRUST_STOP))
+          entities.add(Event.ShipThrustStop)
 
         x += velocity.x
         y += velocity.y
@@ -185,7 +186,7 @@ export default class Ship
       {
         this._lastShotAt = now
 
-        entities.add(new Event(SHOT))
+        entities.add(Event.Shot)
         entities.add(new ShipBullet(this, stageWidth, stageHeight))
       }
     }

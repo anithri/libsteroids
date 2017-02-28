@@ -1,30 +1,29 @@
-import {SET_HIGH_SCORES, SET_RENDERER, SET_SCREEN, SET_USERNAME} from 'state/actions/application'
-import {RENDERER, SCREEN} from 'constants'
+import {Action} from '../actions/application'
+import {Renderer, Screen} from '../../constants'
 
 const initialState = {
   highScores: localStorage.getItem('highScores') ? JSON.parse(localStorage.getItem('highScores')) : [],
-  renderer: RENDERER.SVG,
-  screen: SCREEN.MAIN_MENU,
+  renderer: Renderer.SVG,
+  screen: Screen.MainMenu,
   username: ''
 }
 
-export default (state = initialState, action) =>
+export default function reducer(state = initialState, action)
 {
   switch (action.type)
   {
-    case SET_HIGH_SCORES:
+    case Action.SetHighScores:
       return {...state, highScores: [...action.highScores]}
 
-    case SET_RENDERER:
+    case Action.SetRenderer:
       return {...state, renderer: action.renderer}
 
-    case SET_SCREEN:
+    case Action.SetScreen:
       return {...state, screen: action.screen}
 
-    case SET_USERNAME:
+    case Action.SetUsername:
       return {...state, username: action.username}
-
-    default:
-      return state
   }
+
+  return state
 }
