@@ -26,15 +26,4 @@ if (process.argv[1].split('/').pop() === 'webpack')
   rimraf.sync(buildDirectory)
 }
 
-if (environment === 'development')
-{
-  config.devtool = 'eval-cheap-module-source-map'
-
-  if (config.devServer)
-    Object.assign(config.devServer, {hot: true, inline: true})
-}
-
-else if (config.devServer)
-  Object.assign(config.devServer, {compress: true})
-
 module.exports = config

@@ -2,7 +2,7 @@ const cssnext = require('postcss-cssnext')
 const path = require('path')
 const webpack = require('webpack')
 const CopyPlugin = require('copy-webpack-plugin')
-const {DefinePlugin, HotModuleReplacementPlugin, LoaderOptionsPlugin, NamedModulesPlugin, NoEmitOnErrorsPlugin, optimize} = webpack
+const {DefinePlugin, LoaderOptionsPlugin, NamedModulesPlugin, NoEmitOnErrorsPlugin, optimize} = webpack
 const {UglifyJsPlugin} = optimize
 const environment = process.env.NODE_ENV
 const assetsDirectory = path.resolve(__dirname, '../../libsteroids-assets')
@@ -117,20 +117,16 @@ if (environment === 'production')
   )
 
   if (config.devServer)
-    Object.assign(config.devServer, {compress: true})
+    config.devServer.compress = true
 }
 
 else
 {
-  config.devtool = 'source-map'
-
-  config.plugins.push(
-    new	HotModuleReplacementPlugin(),
-    new NamedModulesPlugin()
-  )
+  config.devtool = 'cheap-module-eval-source-map'
+  config.plugins.push(new NamedModulesPlugin())
 
   if (config.devServer)
-    Object.assign(config.devServer, {hot: true, inline: true})
+    config.devServer.inline = true
 }
 
 module.exports = config

@@ -1,7 +1,6 @@
 const path = require('path')
 const rimraf = require('rimraf')
 const config = require('libsteroids-examples-shared/config/webpack.config')
-const environment = process.env.NODE_ENV
 const rootDirectory = path.resolve(__dirname, '..')
 const sharedDirectory = `${rootDirectory}/node_modules/reacteroids-shared`
 const sourceDirectory = `${rootDirectory}/source`
@@ -26,17 +25,5 @@ if (process.argv[1].split('/').pop() === 'webpack')
   config.output.path = buildDirectory
   rimraf.sync(buildDirectory)
 }
-
-if (environment === 'development')
-{
-  config.devtool = 'eval-cheap-module-source-map'
-  config.module.rules[1].use.query.presets.push('react-hmre')
-
-  if (config.devServer)
-    Object.assign(config.devServer, {hot: true, inline: true})
-}
-
-else if (config.devServer)
-  Object.assign(config.devServer, {compress: true})
 
 module.exports = config
