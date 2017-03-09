@@ -1,4 +1,5 @@
 import {Directive, EventEmitter, HostListener, Output} from '@angular/core'
+import {GameControlKey} from 'libsteroids-examples-shared/js/constants'
 
 @Directive({selector: 'controls'})
 export class Controls
@@ -6,57 +7,57 @@ export class Controls
   @Output()
   private onChange:EventEmitter<any> = new EventEmitter()
 
-  private keys:Set<string> = new Set(['ArrowUp', 'w', 'ArrowLeft', 'a', 'ArrowRight', 'd', 'Shift', ' '])
+  private keyCodes:Set<number> = new Set(Object.values(GameControlKey))
 
-  private keysDown:Set<string> = new Set<string>()
+  private keysDown:Set<number> = new Set<number>()
 
   @HostListener('window:keydown', ['$event'])
   private handleKeyDown(event:KeyboardEvent)
   {
-    if (this.keys.has(event.key)
-    && !this.keysDown.has(event.key))
+    if (this.keyCodes.has(event.keyCode)
+    && !this.keysDown.has(event.keyCode))
     {
-      this.keysDown.add(event.key)
-      this.handleKeyChange(event.key)
+      this.keysDown.add(event.keyCode)
+      this.handleKeyChange(event.keyCode)
     }
   }
 
   @HostListener('window:keyup', ['$event'])
   private handleKeyUp(event:KeyboardEvent)
   {
-    if (this.keys.has(event.key)
-    && this.keysDown.has(event.key))
+    if (this.keyCodes.has(event.keyCode)
+    && this.keysDown.has(event.keyCode))
     {
-      this.keysDown.delete(event.key)
-      this.handleKeyChange(event.key)
+      this.keysDown.delete(event.keyCode)
+      this.handleKeyChange(event.keyCode)
     }
   }
 
-  private handleKeyChange(key:string)
+  private handleKeyChange(keyCode:number)
   {
-    switch (key)
+    switch (keyCode)
     {
-      case 'ArrowUp':
-      case 'w':
-        this.onChange.emit({accelerating: this.keysDown.has('ArrowUp') || this.keysDown.has('w')})
+      case GameControlKey.ArrowUp:
+      case GameControlKey.w:
+        this.onChange.emit({accelerating: this.keysDown.has(GameControlKey.ArrowUp) || this.keysDown.has(GameControlKey.w)})
         break
 
-      case 'ArrowLeft':
-      case 'a':
-        this.onChange.emit({rotatingLeft: this.keysDown.has('ArrowLeft') || this.keysDown.has('a')})
+      case GameControlKey.ArrowLeft:
+      case GameControlKey.a:
+        this.onChange.emit({rotatingLeft: this.keysDown.has(GameControlKey.ArrowLeft) || this.keysDown.has(GameControlKey.a)})
         break
 
-      case 'ArrowRight':
-      case 'd':
-        this.onChange.emit({rotatingRight: this.keysDown.has('ArrowRight') || this.keysDown.has('d')})
+      case GameControlKey.ArrowRight:
+      case GameControlKey.d:
+        this.onChange.emit({rotatingRight: this.keysDown.has(GameControlKey.ArrowRight) || this.keysDown.has(GameControlKey.d)})
         break
 
-      case 'Shift':
-        this.onChange.emit({hyperspace: this.keysDown.has('Shift')})
+      case GameControlKey.Shift:
+        this.onChange.emit({hyperspace: this.keysDown.has(GameControlKey.Shift)})
         break
 
-      case ' ':
-        this.onChange.emit({shooting: this.keysDown.has(' ')})
+      case GameControlKey.Space:
+        this.onChange.emit({shooting: this.keysDown.has(GameControlKey.Space)})
         break
     }
   }

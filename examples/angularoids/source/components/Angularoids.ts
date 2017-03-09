@@ -4,6 +4,7 @@ import {Store} from '@ngrx/store'
 import {ResizeAction, SaveScoreAction, SetAcceleratingAction, SetHyperspaceAction, SetRotatingLeftAction, SetRotatingRightAction, SetRendererAction, SetScreenAction, SetShootingAction} from 'actions'
 import {Renderer, Screen} from 'actions/application'
 import {HighScore, Particle, Polygon, State} from 'interfaces'
+import {RendererSelectKey} from 'libsteroids-examples-shared/js/constants'
 
 @Component({
   selector: 'angularoids',
@@ -23,7 +24,7 @@ import {HighScore, Particle, Polygon, State} from 'interfaces'
 })
 export class Angularoids
 {
-  private rendererSelectKeys:Set<string> = new Set(['1', '2', '3', '4', '5'])
+  private rendererSelectKeys:Set<number> = new Set(Object.values(RendererSelectKey))
 
   private Renderer = Renderer
 
@@ -113,26 +114,24 @@ export class Angularoids
   @HostListener('window:keydown', ['$event'])
   private handleKeyDown(event:KeyboardEvent):void
   {
-    if (this.rendererSelectKeys.has(event.key))
-    {
-      switch (event.key)
+    if (this.rendererSelectKeys.has(event.keyCode))
+      switch (event.keyCode)
       {
-        case '1':
+        case RendererSelectKey['1']:
           return this.store.dispatch(new SetRendererAction(Renderer.SVG))
 
-        case '2':
+        case RendererSelectKey['2']:
           return this.store.dispatch(new SetRendererAction(Renderer.Canvas))
 
-        case '3':
+        case RendererSelectKey['3']:
           return this.store.dispatch(new SetRendererAction(Renderer.PixiCanvas))
 
-        case '4':
+        case RendererSelectKey['4']:
           return this.store.dispatch(new SetRendererAction(Renderer.PixiWebGL))
 
-        case '5':
+        case RendererSelectKey['5']:
           return this.store.dispatch(new SetRendererAction(Renderer.Three))
       }
-    }
   }
 
   @HostListener('window:resize')
